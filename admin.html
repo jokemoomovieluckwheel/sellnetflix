@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - จัดการเว็บไซต์</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="script.js"></script>
+    <style>
+        .admin-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #141414 0%, #2a2a2a 100%);
+            padding: 100px 20px 50px;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .admin-title {
+            color: #fff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-nav-btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Prompt', sans-serif;
+            font-size: 1rem;
+        }
+
+        .admin-nav-btn:hover,
+        .admin-nav-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .admin-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .admin-card-title {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Reviews Table */
+        .reviews-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reviews-table th,
+        .reviews-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .reviews-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .reviews-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .review-rating-display {
+            color: #ffd700;
+        }
+
+        .btn-delete {
+            padding: 0.5rem 1rem;
+            background: #e50914;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .btn-delete:hover {
+            background: #b20710;
+        }
+
+        .btn-clear-all {
+            padding: 1rem 2rem;
+            background: #e50914;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Prompt', sans-serif;
+            margin-top: 1rem;
+        }
+
+        .btn-clear-all:hover {
+            background: #b20710;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #e50914 0%, #ff6b6b 100%);
+            color: #fff;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(229, 9, 20, 0.3);
+        }
+
+        .stat-card.blue {
+            background: linear-gradient(135deg, #0084ff 0%, #00c6ff 100%);
+        }
+
+        .stat-card.green {
+            background: linear-gradient(135deg, #06c755 0%, #00e676 100%);
+        }
+
+        .stat-card.gold {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: var(--text-dark);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #757575;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .back-home-btn {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 0.8rem 1.5rem;
+            background: #fff;
+            color: var(--text-dark);
+            border: 2px solid var(--text-dark);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Prompt', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+            z-index: 100;
+        }
+
+        .back-home-btn:hover {
+            background: var(--text-dark);
+            color: #fff;
+        }
+
+        .refresh-btn {
+            padding: 0.5rem 1rem;
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            margin-left: 1rem;
+        }
+
+        .refresh-btn:hover {
+            background: #b20710;
+        }
+
+        .sync-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(6, 199, 85, 0.1);
+            color: #06c755;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .sync-status i {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Notification Toast - UX/UI */
+        .notification-toast {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            min-width: 350px;
+            max-width: 450px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateX(400px);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .notification-toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification-toast.success {
+            border-left: 4px solid #06c755;
+        }
+
+        .notification-toast.error {
+            border-left: 4px solid #e50914;
+        }
+
+        .notification-toast.info {
+            border-left: 4px solid #0084ff;
+        }
+
+        .notification-toast.warning {
+            border-left: 4px solid #ffd700;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 1.2rem 1.5rem;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+
+        .notification-toast.success .notification-icon {
+            background: linear-gradient(135deg, #06c755 0%, #00e676 100%);
+            color: #fff;
+        }
+
+        .notification-toast.error .notification-icon {
+            background: linear-gradient(135deg, #e50914 0%, #ff6b6b 100%);
+            color: #fff;
+        }
+
+        .notification-toast.info .notification-icon {
+            background: linear-gradient(135deg, #0084ff 0%, #00c6ff 100%);
+            color: #fff;
+        }
+
+        .notification-toast.warning .notification-icon {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #141414;
+        }
+
+        .notification-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .notification-message {
+            font-size: 0.9rem;
+            color: #757575;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .notification-close {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0.3rem;
+            color: #999;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-close:hover {
+            color: var(--text-dark);
+        }
+
+        .notification-progress {
+            height: 3px;
+            background: rgba(0, 0, 0, 0.1);
+            width: 100%;
+            animation: progressShrink linear forwards;
+        }
+
+        .notification-toast.success .notification-progress {
+            animation-duration: 3s;
+            background: linear-gradient(90deg, #06c755, #00e676);
+        }
+
+        .notification-toast.error .notification-progress {
+            animation-duration: 5s;
+            background: linear-gradient(90deg, #e50914, #ff6b6b);
+        }
+
+        .notification-toast.info .notification-progress {
+            animation-duration: 3s;
+            background: linear-gradient(90deg, #0084ff, #00c6ff);
+        }
+
+        .notification-toast.warning .notification-progress {
+            animation-duration: 4s;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(400px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(400px);
+            }
+        }
+
+        @keyframes progressShrink {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .notification-toast {
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+                max-width: none;
+                top: 80px;
+            }
+
+            .notification-content {
+                padding: 1rem;
+            }
+
+            .notification-message {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #06c755;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        @media (max-width: 768px) {
+            .admin-title {
+                font-size: 1.8rem;
+            }
+
+            .reviews-table {
+                font-size: 0.85rem;
+            }
+
+            .reviews-table th,
+            .reviews-table td {
+                padding: 0.5rem;
+            }
+
+            .btn-delete {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.85rem;
+            }
+
+            .back-home-btn {
+                top: auto;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="container">
+                <div class="logo">
+                    <i class="fas fa-play-circle"></i>
+                    <span>NetflixRent Admin</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="inedex.html">หน้าเว็บหลัก</a></li>
+                    <li><a href="wheel.html">วงล้อ</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Admin Page -->
+    <section class="admin-page">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1 class="admin-title">🛠️ หน้าจัดการเว็บไซต์</h1>
+                <p class="admin-subtitle">จัดการรีวิว ดูสถิติ และตั้งค่าต่างๆ</p>
+            </div>
+
+            <!-- Sync Status -->
+            <div class="sync-status">
+                <i class="fas fa-sync-alt"></i>
+                <span>ข้อมูลซิงค์แบบ Real-time กับหน้าเว็บหลัก</span>
+            </div>
+
+            <!-- Navigation -->
+            <div class="admin-nav">
+                <button class="admin-nav-btn active" onclick="showSection('dashboard')">
+                    <i class="fas fa-chart-line"></i> แดชบอร์ด
+                </button>
+                <button class="admin-nav-btn" onclick="showSection('reviews')">
+                    <i class="fas fa-comments"></i> จัดการรีวิว
+                </button>
+                <button class="admin-nav-btn" onclick="showSection('packages')">
+                    <i class="fas fa-box"></i> แพ็กเกจ
+                </button>
+                <button class="admin-nav-btn" onclick="showSection('settings')">
+                    <i class="fas fa-cog"></i> ตั้งค่า
+                </button>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="admin-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number" id="totalReviews">0</span>
+                        <span class="stat-label">รีวิวทั้งหมด</span>
+                    </div>
+                    <div class="stat-card blue">
+                        <span class="stat-number" id="avgRating">0.0</span>
+                        <span class="stat-label">คะแนนเฉลี่ย</span>
+                    </div>
+                    <div class="stat-card green">
+                        <span class="stat-number" id="trustedCount">0</span>
+                        <span class="stat-label">ลูกค้าไว้วางใจ</span>
+                    </div>
+                    <div class="stat-card gold">
+                        <span class="stat-number" id="totalPackages">5</span>
+                        <span class="stat-label">แพ็กเกจ</span>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <h3 class="admin-card-title">
+                        <i class="fas fa-info-circle"></i> ข้อมูลเว็บไซต์
+                    </h3>
+                    <div style="line-height: 2; color: #757575;">
+                        <p><strong>ชื่อเว็บ:</strong> NetflixRent</p>
+                        <p><strong>หน้าหลัก:</strong> <a href="inedex.html" style="color: var(--primary-color);">inedex.html</a></p>
+                        <p><strong>หน้าวงล้อ:</strong> <a href="wheel.html" style="color: var(--primary-color);">wheel.html</a></p>
+                        <p><strong>ข้อมูลเก็บใน:</strong> LocalStorage (เบราว์เซอร์)</p>
+                        <p><strong>สถานะ:</strong> <span style="color: #06c755;">✓ ใช้งานได้แล้ว</span></p>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <h3 class="admin-card-title">
+                        <i class="fas fa-bolt"></i> ด่วน
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <button class="btn-clear-all" style="margin: 0; background: #06c755;" onclick="window.open('inedex.html', '_blank')">
+                            <i class="fas fa-external-link-alt"></i> เปิดหน้าเว็บ
+                        </button>
+                        <button class="btn-clear-all" style="margin: 0; background: #0084ff;" onclick="showSection('reviews')">
+                            <i class="fas fa-comments"></i> จัดการรีวิว
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews Management Section -->
+            <div id="reviews" class="admin-section">
+                <div class="admin-card">
+                    <h3 class="admin-card-title">
+                        <i class="fas fa-comments"></i> จัดการรีวิว
+                        <button class="refresh-btn" onclick="loadDashboard()">
+                            <i class="fas fa-redo"></i> รีเฟรช
+                        </button>
+                    </h3>
+                    <div style="overflow-x: auto;">
+                        <table class="reviews-table">
+                            <thead>
+                                <tr>
+                                    <th>ชื่อ</th>
+                                    <th>รีวิว</th>
+                                    <th>คะแนน</th>
+                                    <th>วันที่</th>
+                                    <th>จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reviewsTableBody">
+                                <!-- Reviews will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="emptyReviews" class="empty-state" style="display: none;">
+                        <i class="fas fa-inbox"></i>
+                        <p>ยังไม่มีรีวิว</p>
+                    </div>
+                    <button class="btn-clear-all" onclick="clearAllReviews()">
+                        <i class="fas fa-trash-alt"></i> ลบรีวิวทั้งหมด
+                    </button>
+                </div>
+            </div>
+
+            <!-- Packages Section -->
+            <div id="packages" class="admin-section">
+                <div class="admin-card">
+                    <h3 class="admin-card-title">
+                        <i class="fas fa-box"></i> แพ็กเกจปัจจุบัน
+                    </h3>
+                    <div id="packagesList">
+                        <!-- Packages will be loaded here -->
+                    </div>
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: #f5f5f5; border-radius: 10px;">
+                        <p style="color: #757575; margin: 0;">
+                            <i class="fas fa-info-circle"></i> 
+                           若要修改แพ็กเกจ，請編輯 <code>script.js</code> 中的 <code>packagesConfig</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings" class="admin-section">
+                <div class="admin-card">
+                    <h3 class="admin-card-title">
+                        <i class="fas fa-database"></i> ข้อมูลและการสำรอง
+                    </h3>
+                    <div style="display: grid; gap: 1rem;">
+                        <button class="btn-clear-all" style="margin: 0; background: #0084ff;" onclick="exportData()">
+                            <i class="fas fa-download"></i> สำรองข้อมูล (Export)
+                        </button>
+                        <label class="btn-clear-all" style="margin: 0; background: #06c755; cursor: pointer;">
+                            <i class="fas fa-upload"></i> กู้ข้อมูล (Import)
+                            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                        </label>
+                        <button class="btn-clear-all" style="margin: 0; background: #ffd700; color: #000;" onclick="resetAllData()">
+                            <i class="fas fa-exclamation-triangle"></i> รีเซ็ตข้อมูลทั้งหมด
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <h3 class="admin-card-title">
+                        <i class="fas fa-user-shield"></i> ตั้งค่าการเขียนรีวิว
+                    </h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f5f5f5; border-radius: 10px; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin: 0; color: var(--text-dark);">จำกัด 1 คน = 1 รีวิว</h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #757575; font-size: 0.9rem;">เปิด/ปิด ระบบจำกัดสิทธิ์การเขียนรีวิว</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="reviewRestrictionToggle" checked onchange="toggleReviewRestriction(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #e3f2fd; border-radius: 10px; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin: 0; color: #1565c0;">แสดงระบบจำกัดสิทธิ์</h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #1565c0; font-size: 0.9rem;">เปิด/ปิด การแสดงข้อความจำกัดสิทธิ์</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="reviewRestrictionDisplayToggle" checked onchange="toggleReviewRestrictionDisplay(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <p style="color: #757575; font-size: 0.9rem; margin: 0;">
+                        <i class="fas fa-info-circle"></i> เมื่อเปิดใช้งาน: แต่ละผู้ใช้จะสามารถเขียนรีวิวได้แค่ 1 ครั้งเท่านั้น
+                    </p>
+                </div>
+
+                <div class="admin-card">
+                    <h3 class="admin-card-title">
+                        <i class="fas fa-user-clock"></i> สถานะแอดมินออนไลน์
+                    </h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: linear-gradient(135deg, #06c755 0%, #00e676 100%); border-radius: 10px; margin-bottom: 1rem; color: #fff;">
+                        <div>
+                            <h4 style="margin: 0;"><i class="fas fa-signal"></i> แสดงสถานะออนไลน์</h4>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.9;">ให้ผู้ใช้เห็นว่าแอดมินออนไลน์อยู่</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="adminOnlineToggle" onchange="toggleAdminOnline(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div id="adminOnlineStatus" style="padding: 1rem; background: #f5f5f5; border-radius: 10px; margin-top: 1rem; display: flex; align-items: center; gap: 1rem;">
+                        <div class="status-indicator" style="width: 15px; height: 15px; border-radius: 50%; background: #ccc;"></div>
+                        <span id="adminOnlineText" style="color: #757575;">กำลังโหลด...</span>
+                    </div>
+                    <p style="color: #757575; font-size: 0.9rem; margin: 1rem 0 0 0;">
+                        <i class="fas fa-info-circle"></i> เมื่อเปิดใช้งาน: ผู้ใช้จะเห็นไอคอน "แอดมินออนไลน์" ที่หน้าเว็บหลัก
+                    </p>
+                </div>
+
+                <div class="admin-card">
+                    <h3 class="admin-card-title">
+                        <i class="fas fa-tools"></i> โหมดปรับปรุงระบบ (Maintenance Mode)
+                    </h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #fff3cd; border-radius: 10px; margin-bottom: 1rem; border: 2px solid #ffc107;">
+                        <div>
+                            <h4 style="margin: 0; color: #856404;">⚠️ ปิดเว็บไซต์ชั่วคราว</h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #856404; font-size: 0.9rem;">แสดงหน้ากำลังปรับปรุงระบบ</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="maintenanceModeToggle" onchange="toggleMaintenanceMode(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <p style="color: #757575; font-size: 0.9rem; margin: 0;">
+                        <i class="fas fa-exclamation-triangle"></i> เมื่อเปิดใช้งาน: ผู้ใช้จะเห็นหน้า "กำลังปรับปรุงระบบ" แทนหน้าเว็บหลัก
+                    </p>
+                </div>
+
+                <div class="admin-card">
+                    <h3 class="admin-card-title">
+                        <i class="fas fa-link"></i> Google Apps Script Backend
+                    </h3>
+                    <p style="color: #757575; margin-bottom: 1rem;">
+                        ตั้งค่าเพื่อใช้ Google Apps Script เป็น Backend สำหรับเก็บข้อมูลบน Cloud และแชร์ข้ามอุปกรณ์
+                    </p>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #e3f2fd; border-radius: 10px; margin-bottom: 1rem;">
+                        <div>
+                            <h4 style="margin: 0; color: #1565c0;">🔗 ใช้ Google Apps Script</h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #1565c0; font-size: 0.9rem;">เปิด/ปิด การใช้ Cloud Backend</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="useAppsScriptToggle" onchange="toggleUseAppsScript(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div style="display: grid; gap: 1rem;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Apps Script Web App URL:</label>
+                            <input type="text" id="appsScriptUrl" placeholder="https://script.google.com/macros/s/...../exec"
+                                   style="width: 100%; padding: 0.8rem; border: 2px solid #e0e0e0; border-radius: 8px; font-family: monospace; font-size: 0.85rem;">
+                            <p style="color: #757575; font-size: 0.85rem; margin-top: 0.5rem;">
+                                <i class="fas fa-info-circle"></i> คู่มือติดตั้ง: ดูในไฟล์ INSTALL_APPS_SCRIPT.md
+                            </p>
+                        </div>
+                        <button class="btn-clear-all" style="margin: 0; background: #0084ff;" onclick="saveAppsScriptSettings()">
+                            <i class="fas fa-save"></i> บันทึกการตั้งค่า
+                        </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <a href="inedex.html" class="back-home-btn">
+        <i class="fas fa-home"></i> กลับหน้าหลัก
+    </a>
+
+    <script>
+        // Don't declare constants - sync.js already exports them to window
+        // Just use the values directly
+        
+        // Check if using Google Apps Script
+        const useAppsScript = localStorage.getItem('netflix_use_apps_script') === 'true';
+        const appsScriptUrl = localStorage.getItem('netflixAppsScriptUrl') || '';
+        
+        console.log('Admin Panel - Using Apps Script:', useAppsScript);
+        console.log('Apps Script URL:', appsScriptUrl ? appsScriptUrl.substring(0, 50) + '...' : 'Not set');
+
+        // Show beautiful notification
+        function showNotification(message, type = 'success', duration = 3000) {
+            // Remove existing notification if any
+            const existing = document.querySelector('.notification-toast');
+            if (existing) {
+                existing.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification-toast ${type}`;
+
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                info: 'fa-info-circle',
+                warning: 'fa-exclamation-triangle'
+            };
+
+            const messages = {
+                success: 'สำเร็จ!',
+                error: 'เกิดข้อผิดพลาด!',
+                info: 'ข้อมูล',
+                warning: 'คำเตือน'
+            };
+
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <div class="notification-icon">
+                        <i class="fas ${icons[type] || icons.success}"></i>
+                    </div>
+                    <div class="notification-body">
+                        <div class="notification-title">${messages[type] || messages.success}</div>
+                        <div class="notification-message">${message}</div>
+                    </div>
+                    <button class="notification-close" onclick="this.closest('.notification-toast').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="notification-progress"></div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Animate in
+            setTimeout(() => notification.classList.add('show'), 10);
+
+            // Auto remove after duration
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, duration);
+        }
+
+        // Show section
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active from all nav buttons
+            document.querySelectorAll('.admin-nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected section
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.classList.add('active');
+            }
+
+            // Add active to clicked button
+            if (event && event.target) {
+                event.target.closest('.admin-nav-btn').classList.add('active');
+            }
+
+            // Load data for section
+            if (sectionId === 'dashboard') {
+                loadDashboard();
+            } else if (sectionId === 'reviews') {
+                renderReviewsTable();
+            } else if (sectionId === 'packages') {
+                loadPackages();
+            } else if (sectionId === 'settings') {
+                loadSettings();
+            }
+        }
+
+        // Load dashboard stats
+        function loadDashboard() {
+            const reviews = getReviews();
+            const trustedData = JSON.parse(localStorage.getItem('netflixTrustedCount_shared') || '{"count": 103}');
+            
+            document.getElementById('totalReviews').textContent = reviews.length;
+            
+            const avgRating = reviews.length > 0 
+                ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+                : '0.0';
+            document.getElementById('avgRating').textContent = avgRating;
+            
+            document.getElementById('trustedCount').textContent = trustedData.count.toLocaleString();
+        }
+
+        // Get reviews
+        function getReviews() {
+            const stored = localStorage.getItem('netflixReviews_shared');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        // Render reviews table
+        function renderReviewsTable() {
+            const reviews = getReviews();
+            const tbody = document.getElementById('reviewsTableBody');
+            const emptyState = document.getElementById('emptyReviews');
+            
+            if (reviews.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            tbody.innerHTML = reviews.map((review, index) => `
+                <tr>
+                    <td>${review.name}</td>
+                    <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${review.text}</td>
+                    <td>
+                        <span class="review-rating-display">
+                            ${'<i class="fas fa-star"></i>'.repeat(review.rating)}
+                            ${'<i class="far fa-star"></i>'.repeat(5 - review.rating)}
+                        </span>
+                    </td>
+                    <td>${new Date(review.date).toLocaleDateString('th-TH')}</td>
+                    <td>
+                        <button class="btn-delete" onclick="deleteReview(${index})">
+                            <i class="fas fa-trash"></i> ลบ
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Delete review
+        function deleteReview(index) {
+            if (!confirm('คุณต้องการลบรีวิวนี้ใช่ไหม?')) return;
+
+            const reviews = getReviews();
+            reviews.splice(index, 1);
+            localStorage.setItem('netflixReviews_shared', JSON.stringify(reviews));
+
+            renderReviewsTable();
+            loadDashboard();
+
+            showNotification('ลบรีวิวเรียบร้อยแล้ว', 'success');
+
+            // Force storage event for sync
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        // Clear all reviews
+        function clearAllReviews() {
+            if (!confirm('คุณต้องการลบรีวิวทั้งหมดใช่ไหม? การกระทำนี้ไม่สามารถย้อนกลับได้!')) return;
+
+            localStorage.removeItem('netflixReviews_shared');
+            renderReviewsTable();
+            loadDashboard();
+
+            showNotification('ลบรีวิวทั้งหมดแล้ว', 'success');
+            // Force storage event for sync
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        // Load packages
+        function loadPackages() {
+            const packagesList = document.getElementById('packagesList');
+            
+            const defaultPackages = [
+                { name: '1 วัน', price: 20, badge: 'ทดลองใช้' },
+                { name: '3 วัน', price: 50, badge: 'ยอดนิยม' },
+                { name: '1 สัปดาห์', price: 80, badge: 'คุ้มค่า' },
+                { name: '1 เดือน', price: 150, badge: 'ประหยัดสุด' },
+                { name: '3 เดือน', price: 390, badge: 'สุดคุ้ม' }
+            ];
+            
+            packagesList.innerHTML = defaultPackages.map((pkg, index) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid #e0e0e0;">
+                    <div>
+                        <strong style="font-size: 1.1rem;">${pkg.name}</strong>
+                        <span style="margin-left: 10px; padding: 0.3rem 0.8rem; background: #e50914; color: #fff; border-radius: 15px; font-size: 0.85rem;">${pkg.badge}</span>
+                    </div>
+                    <div style="font-size: 1.3rem; font-weight: 700; color: var(--primary-color);">฿${pkg.price}</div>
+                </div>
+            `).join('');
+        }
+
+        // Load settings
+        function loadSettings() {
+            const url = localStorage.getItem('netflixAppsScriptUrl') || '';
+            document.getElementById('appsScriptUrl').value = url;
+            
+            // Load use Apps Script setting
+            const useAppsScript = localStorage.getItem('netflix_use_apps_script') === 'true';
+            const useAppsScriptToggle = document.getElementById('useAppsScriptToggle');
+            if (useAppsScriptToggle) {
+                useAppsScriptToggle.checked = useAppsScript;
+            }
+            
+            // Load review restriction setting
+            const restrictionEnabled = localStorage.getItem('netflix_review_restriction_enabled');
+            const toggle = document.getElementById('reviewRestrictionToggle');
+            if (toggle) {
+                toggle.checked = restrictionEnabled !== null ? JSON.parse(restrictionEnabled) : true;
+            }
+            
+            // Load review restriction display setting
+            const restrictionDisplayEnabled = localStorage.getItem('netflix_review_restriction_display');
+            const displayToggle = document.getElementById('reviewRestrictionDisplayToggle');
+            if (displayToggle) {
+                displayToggle.checked = restrictionDisplayEnabled !== null ? JSON.parse(restrictionDisplayEnabled) : true;
+            }
+            
+            // Load maintenance mode setting
+            const maintenanceEnabled = localStorage.getItem('netflix_maintenance_mode');
+            const maintenanceToggle = document.getElementById('maintenanceModeToggle');
+            if (maintenanceToggle) {
+                maintenanceToggle.checked = maintenanceEnabled !== null ? JSON.parse(maintenanceEnabled) : false;
+            }
+            
+            // Load admin online setting
+            const adminOnlineEnabled = localStorage.getItem('netflix_admin_online');
+            const adminOnlineToggle = document.getElementById('adminOnlineToggle');
+            if (adminOnlineToggle) {
+                adminOnlineToggle.checked = adminOnlineEnabled !== null ? JSON.parse(adminOnlineEnabled) : false;
+            }
+            
+            // Update admin online display
+            updateAdminOnlineDisplay();
+            
+            // Update admin online status every minute
+            setInterval(updateAdminOnlineDisplay, 60000);
+        }
+
+        // Toggle use Apps Script
+        function toggleUseAppsScript(enabled) {
+            localStorage.setItem('netflix_use_apps_script', JSON.stringify(enabled));
+            showNotification(
+                enabled ? 'เปิดใช้ Google Apps Script Backend แล้ว' : 'ปิด Google Apps Script Backend แล้ว (ใช้ localStorage)',
+                enabled ? 'success' : 'info',
+                5000
+            );
+            // Force storage event for sync
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        // Toggle review restriction
+        function toggleReviewRestriction(enabled) {
+            localStorage.setItem(window.REVIEW_RESTRICTION_KEY, JSON.stringify(enabled));
+            showNotification(
+                enabled ? 'เปิดใช้งานจำกัด 1 คน = 1 รีวิวแล้ว' : 'ปิดระบบจำกัดสิทธิ์แล้ว (เขียนรีวิวได้ไม่จำกัด)',
+                'success'
+            );
+            // Notify other tabs
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        // Toggle review restriction display
+        function toggleReviewRestrictionDisplay(enabled) {
+            localStorage.setItem(window.REVIEW_RESTRICTION_DISPLAY_KEY, JSON.stringify(enabled));
+            showNotification(
+                enabled ? 'เปิดการแสดงข้อความจำกัดสิทธิ์' : 'ปิดการแสดงข้อความจำกัดสิทธิ์แล้ว',
+                'info'
+            );
+            // Notify other tabs
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        // Toggle admin online status
+        function toggleAdminOnline(enabled) {
+            localStorage.setItem(window.ADMIN_ONLINE_KEY, JSON.stringify(enabled));
+
+            // Update last seen timestamp
+            if (enabled) {
+                localStorage.setItem(window.ADMIN_LAST_SEEN_KEY, new Date().toISOString());
+            }
+            
+            updateAdminOnlineDisplay();
+            
+            showNotification(
+                enabled ? 'เปิดสถานะออนไลน์แล้ว - ผู้ใช้จะเห็นว่าคุณออนไลน์' : 'ปิดสถานะออนไลน์แล้ว',
+                enabled ? 'success' : 'info'
+            );
+            // Notify other tabs
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        // Update admin online display
+        function updateAdminOnlineDisplay() {
+            const toggle = document.getElementById('adminOnlineToggle');
+            const indicator = document.querySelector('.status-indicator');
+            const text = document.getElementById('adminOnlineText');
+            
+            if (!toggle || !indicator || !text) return;
+            
+            const isEnabled = toggle.checked;
+            
+            if (isEnabled) {
+                indicator.style.background = '#06c755';
+                indicator.style.boxShadow = '0 0 10px #06c755';
+                text.textContent = '🟢 แอดมินออนไลน์อยู่';
+                text.style.color = '#06c755';
+                text.style.fontWeight = '600';
+            } else {
+                const lastSeen = localStorage.getItem('netflix_admin_last_seen');
+                if (lastSeen) {
+                    const lastSeenDate = new Date(lastSeen);
+                    const timeAgo = getTimeAgo(lastSeenDate);
+                    indicator.style.background = '#ccc';
+                    indicator.style.boxShadow = 'none';
+                    text.textContent = `⚫ ออฟไลน์ (เห็นล่าสุด: ${timeAgo})`;
+                    text.style.color = '#757575';
+                    text.style.fontWeight = '400';
+                } else {
+                    indicator.style.background = '#ccc';
+                    indicator.style.boxShadow = 'none';
+                    text.textContent = '⚫ ออฟไลน์';
+                    text.style.color = '#757575';
+                    text.style.fontWeight = '400';
+                }
+            }
+        }
+
+        // Get time ago function
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffMins < 1) return 'เมื่อสักครู่';
+            if (diffMins < 60) return `${diffMins} นาทีที่แล้ว`;
+            if (diffHours < 24) return `${diffHours} ชั่วโมงที่แล้ว`;
+            if (diffDays < 7) return `${diffDays} วันที่แล้ว`;
+            return date.toLocaleDateString('th-TH');
+        }
+
+        // Toggle maintenance mode
+        function toggleMaintenanceMode(enabled) {
+            localStorage.setItem(window.MAINTENANCE_MODE_KEY, JSON.stringify(enabled));
+            showNotification(
+                enabled ? 'เปิดโหมดปรับปรุงระบบแล้ว - ผู้ใช้จะเห็นหน้าปิดเว็บไซต์' : 'ปิดโหมดปรับปรุงระบบแล้ว - เว็บไซต์เปิดใช้งานปกติ',
+                enabled ? 'warning' : 'success',
+                5000
+            );
+            // Notify other tabs
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        // Save Apps Script settings
+        function saveAppsScriptSettings() {
+            const url = document.getElementById('appsScriptUrl').value.trim();
+            if (!url) {
+                showNotification('กรุณาใส่ Google Apps Script URL', 'warning');
+                return;
+            }
+            localStorage.setItem(APPS_SCRIPT_KEY, url);
+            showNotification('บันทึกการตั้งค่าแล้ว - รีเฟรชหน้าเว็บเพื่อใช้งาน', 'success', 5000);
+            setTimeout(() => location.reload(), 2000);
+        }
+
+        // Export data
+        function exportData() {
+            const data = {
+                reviews: getReviews(),
+                trustedCount: JSON.parse(localStorage.getItem('netflixTrustedCount_shared') || '{"count": 103}'),
+                exportDate: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `netflix-rent-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showNotification('สำรองข้อมูลแล้ว', 'success');
+        }
+
+        // Import data
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+
+                    if (data.reviews) {
+                        localStorage.setItem('netflixReviews_shared', JSON.stringify(data.reviews));
+                    }
+                    if (data.trustedCount) {
+                        localStorage.setItem('netflixTrustedCount_shared', JSON.stringify(data.trustedCount));
+                    }
+
+                    showNotification('กู้ข้อมูลแล้ว', 'success');
+                    loadDashboard();
+                    renderReviewsTable();
+                    window.dispatchEvent(new Event('storage'));
+                } catch (error) {
+                    showNotification('ไฟล์ไม่ถูกต้อง', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Reset all data
+        function resetAllData() {
+            if (!confirm('⚠️ คำเตือน: การกระทำนี้จะลบข้อมูลทั้งหมด (รีวิว, สถิติ) และไม่สามารถกู้คืนได้!\n\nคุณแน่ใจหรือไม่?')) return;
+
+            localStorage.removeItem('netflixReviews_shared');
+            localStorage.removeItem('netflixTrustedCount_shared');
+            localStorage.removeItem('netflixAppsScriptUrl');
+            localStorage.removeItem('netflix_review_restriction_enabled');
+            localStorage.removeItem('netflix_review_restriction_display');
+            localStorage.removeItem('netflix_maintenance_mode');
+            localStorage.removeItem('netflix_admin_online');
+            localStorage.removeItem('netflix_admin_last_seen');
+
+            showNotification('รีเซ็ตข้อมูลแล้ว', 'success');
+            loadDashboard();
+            renderReviewsTable();
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const existing = document.querySelector('.notification-toast');
+            if (existing) existing.remove();
+            
+            const notification = document.createElement('div');
+            notification.className = `notification-toast ${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: #fff;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                min-width: 300px;
+                opacity: 0;
+                transform: translateX(400px);
+                transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                border-left: 4px solid ${type === 'success' ? '#06c755' : '#e50914'};
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 10);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Listen for storage changes from other tabs
+        window.addEventListener('storage', () => {
+            loadDashboard();
+            renderReviewsTable();
+        });
+
+        // Initialize - Load default section
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Admin panel loaded');
+            loadDashboard();
+            
+            // Make showSection globally available
+            window.showSection = showSection;
+            window.toggleReviewRestriction = toggleReviewRestriction;
+            window.toggleReviewRestrictionDisplay = toggleReviewRestrictionDisplay;
+            window.toggleAdminOnline = toggleAdminOnline;
+            window.toggleMaintenanceMode = toggleMaintenanceMode;
+            window.saveAppsScriptSettings = saveAppsScriptSettings;
+            window.exportData = exportData;
+            window.importData = importData;
+            window.resetAllData = resetAllData;
+            window.deleteReview = deleteReview;
+            window.clearAllReviews = clearAllReviews;
+        });
+    </script>
+</body>
+</html>
